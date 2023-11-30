@@ -1,4 +1,4 @@
-module github.com/sampgo/command
+module github.com/MikMik1011/gommand
 
 go 1.15
 

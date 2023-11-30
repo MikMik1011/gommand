@@ -66,6 +66,28 @@ var (
 	afterFunc AfterFunc
 )
 
+var (
+	// commandNotFoundText is the text sent to player when command is not found
+	commandNotFoundText = ""
+	// commandNotFoundColor is the color of command not found text
+	commandNotFoundColor = 0x0000FF
+)
+
+// setCommandNotFound sets the command not found text
+func setCommandNotFound(color int, text string) {
+	commandNotFoundColor = color
+	commandNotFoundText = text
+}
+
+func sendCommandNotFoundText(p sampgo.Player) bool {
+	if commandNotFoundText != "" {
+		err := p.SendMessage(commandNotFoundColor, commandNotFoundText)
+		return err == nil
+
+	}
+	return false
+}
+
 // pushCommandPrefix just pushes a new prefix into commandPrefixes
 func pushCommandPrefix(prefix string) {
 	for _, cmdPrefix := range commandPrefixes {
@@ -182,7 +204,7 @@ func (cmd *Command) Handle(fn Func) (err error) {
 // handler is internal command handler
 func handler(p sampgo.Player, text string) bool {
 	if len(commands) == 0 {
-		return false
+		return sendCommandNotFoundText(p)
 	}
 
 	var (
@@ -212,7 +234,7 @@ func handler(p sampgo.Player, text string) bool {
 	}
 
 	if command == nil {
-		return false
+		return sendCommandNotFoundText(p)
 	}
 
 	cmdCtx := Context{p, args}
@@ -222,24 +244,24 @@ func handler(p sampgo.Player, text string) bool {
 	if beforeFunc != nil {
 		err = beforeFunc(cmdCtx)
 		if err != nil {
-			return false
+			return sendCommandNotFoundText(p)
 		}
 	}
 	for _, fn := range (*command).fn {
 		if err := fn(cmdCtx); err != nil {
 			if errorFunc != nil {
 				if !errorFunc(ErrorContext{command.cmd, err}) {
-					return false
+					return sendCommandNotFoundText(p)
 				}
 			} else {
-				return false
+				return sendCommandNotFoundText(p)
 			}
 		}
 	}
 	if afterFunc != nil {
 		err = afterFunc(cmdCtx)
 		if err != nil {
-			return false
+			return sendCommandNotFoundText(p)
 		}
 	}
 
