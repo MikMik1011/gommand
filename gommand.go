@@ -97,8 +97,8 @@ func New() (cmd *Command) {
 	cmd = &Command{}
 	return
 }
-func NewCompleteCommand(command Command, fn Func) (cmd *Command) {
-	cmd = NewCommand(command)
+func NewCompleteCommand(name string, aliases []string, fn Func) (cmd *Command) {
+	cmd = NewCommand(Command{Name: name, Alias: aliases})
 	cmd.Handle(fn)
 	return
 }
