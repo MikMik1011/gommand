@@ -97,6 +97,11 @@ func New() (cmd *Command) {
 	cmd = &Command{}
 	return
 }
+func NewCompleteCommand(command Command, fn Func) (cmd *Command) {
+	cmd = NewCommand(command)
+	cmd.Handle(fn)
+	return
+}
 
 // SetName sets the command name
 func (cmd *Command) SetName(name string) *Command {
