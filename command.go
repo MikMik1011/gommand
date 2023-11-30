@@ -74,7 +74,7 @@ var (
 )
 
 // setCommandNotFound sets the command not found text
-func setCommandNotFound(color int, text string) {
+func SetCommandNotFound(color int, text string) {
 	commandNotFoundColor = color
 	commandNotFoundText = text
 }
