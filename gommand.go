@@ -1,4 +1,4 @@
-package command
+package gommand
 
 import (
 	"errors"
@@ -73,7 +73,7 @@ var (
 	commandNotFoundColor = 0x0000FF
 )
 
-// setCommandNotFound sets the command not found text
+// SetCommandNotFound sets the command not found text
 func SetCommandNotFound(color int, text string) {
 	commandNotFoundColor = color
 	commandNotFoundText = text
