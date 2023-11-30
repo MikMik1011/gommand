@@ -10,8 +10,7 @@ import (
 
 func TestEntryPoint(t *testing.T) {
 	cmd := NewCommand(Command{
-		Name:   "f",
-		Prefix: "/",
+		Name: "f",
 	})
 
 	cmd.SetName("foo")
@@ -48,36 +47,4 @@ func TestEntryPoint(t *testing.T) {
 		t.Error(fail)
 	}
 
-	cmd.Prefix = "$"
-	err = cmd.Sync()
-	if err != nil {
-		t.Error(err)
-	}
-
-	success = handler(sampgo.Player{ID: 1}, "$bar second handler call")
-	if !success {
-		t.Error(fail)
-	}
-
-	cmd.SetPrefix("barbazbax")
-	err = cmd.Sync()
-	if err != nil {
-		t.Error(err)
-	}
-
-	success = handler(sampgo.Player{ID: 2}, "barbazbaxbaz third handler call")
-	if !success {
-		t.Error(fail)
-	}
-
-	cmd.SetAlias("foobar!")
-	err = cmd.Sync()
-	if err != nil {
-		t.Error(err)
-	}
-
-	success = handler(sampgo.Player{ID: 3}, "barbazbaxfoobar! fourth handler call")
-	if !success {
-		t.Error(fail)
-	}
 }

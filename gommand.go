@@ -9,9 +9,8 @@ import (
 
 // Command struct represents a command
 type Command struct {
-	Name   string
-	Alias  []string
-	Prefix string
+	Name  string
+	Alias []string
 }
 
 // Context is a struct passed to a command handler
@@ -53,8 +52,7 @@ var (
 
 var (
 	// commands stores command handlers
-	commands        = make(map[string]internalCommand)
-	commandPrefixes []string
+	commands = make(map[string]internalCommand)
 )
 
 var (
@@ -88,28 +86,15 @@ func sendCommandNotFoundText(p sampgo.Player) bool {
 	return false
 }
 
-// pushCommandPrefix just pushes a new prefix into commandPrefixes
-func pushCommandPrefix(prefix string) {
-	for _, cmdPrefix := range commandPrefixes {
-		if prefix == cmdPrefix {
-			return
-		}
-	}
-	commandPrefixes = append(commandPrefixes, prefix)
-}
-
 // NewCommand returns a new command
 func NewCommand(command Command) (cmd *Command) {
-	pushCommandPrefix("/")
 	cmd = &command
-	cmd.Prefix = "/"
 	return
 }
 
 // New returns an empty Command struct
 func New() (cmd *Command) {
-	pushCommandPrefix("/")
-	cmd.Prefix = "/"
+	cmd = &Command{}
 	return
 }
 
@@ -122,13 +107,6 @@ func (cmd *Command) SetName(name string) *Command {
 // SetAlias sets the aliases for the command
 func (cmd *Command) SetAlias(aliases ...string) *Command {
 	cmd.Alias = aliases
-	return cmd
-}
-
-// SetPrefix sets the command prefix
-func (cmd *Command) SetPrefix(prefix string) *Command {
-	pushCommandPrefix("/")
-	cmd.Prefix = prefix
 	return cmd
 }
 
@@ -150,8 +128,6 @@ func (cmd *Command) Sync() (err error) {
 	for _, alias := range command.cmd.Alias {
 		commands[alias] = command
 	}
-
-	pushCommandPrefix(command.cmd.Prefix)
 
 	return
 }
@@ -177,12 +153,6 @@ func (cmd *Command) Handle(fn Func) (err error) {
 		err = ErrInvalidCommand
 		return
 	}
-
-	if cmd.Prefix == "" {
-		cmd.Prefix = "/"
-	}
-
-	pushCommandPrefix(cmd.Prefix)
 
 	command, ok := commands[cmd.Name]
 	if !ok {
@@ -213,25 +183,21 @@ func handler(p sampgo.Player, text string) bool {
 		args    []string
 	)
 
-	for _, prefix := range commandPrefixes {
-		cmdName = strings.TrimPrefix(text, prefix)
-		args = strings.Split(cmdName, " ")
+	cmdName = strings.TrimPrefix(text, "/")
+	args = strings.Split(cmdName, " ")
 
-		if len(args) == 1 {
-			args = nil
-		} else {
-			cmdName = args[0]
-			args = append(args[1:])
-		}
-
-		cmd, ok := commands[cmdName]
-		if !ok {
-			continue
-		} else {
-			command = &cmd
-			break
-		}
+	if len(args) == 1 {
+		args = nil
+	} else {
+		cmdName = args[0]
+		args = append(args[1:])
 	}
+
+	cmd, ok := commands[cmdName]
+	if !ok {
+		return sendCommandNotFoundText(p)
+	}
+	command = &cmd
 
 	if command == nil {
 		return sendCommandNotFoundText(p)
@@ -270,5 +236,4 @@ func handler(p sampgo.Player, text string) bool {
 
 func init() {
 	sampgo.On("playerCommandText", handler)
-	sampgo.On("playerText", handler)
 }
